@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 7%;
+  --foreground: 210 40% 96%;
+
+  --card: 222 47% 10%;
+  --card-foreground: 210 40% 96%;
+
+  --popover: 222 47% 9%;
+  --popover-foreground: 210 40% 96%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 222 47% 11%;
+
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 96%;
+
+  --muted: 217 33% 15%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --accent: 217 33% 19%;
+  --accent-foreground: 210 40% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217 33% 18%;
+  --input: 217 33% 18%;
+  --ring: 212.8 100% 45%;
+
+  --radius: 0.5rem;
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  /* Figures line up in tables and money columns without needing a monospace font */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbars for operational console feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
