@@ -1,6 +1,6 @@
 import { ValidatedBriefAnalysis } from '../schemas/brief-analysis-schema';
 import { Job, AnalysisDecision } from '@/types';
-import { getModelByCapability, HIGGSFIELD_MODELS } from '../constants';
+import { deriveJobSignals, resolveCapabilityModel } from './model-selection';
 
 export interface DeterministicEvaluationResult {
   decision: AnalysisDecision;
@@ -33,9 +33,11 @@ export class DeterministicEvaluator {
 
     let totalProductionCost = 0;
 
-    // 1. Calculate deterministic production cost using application's model catalog
+    // 1. Calculate deterministic production cost using the same catalogue models the
+    //    workflow planner will choose for this job (shared selection rules)
+    const signals = deriveJobSignals(analysis, { rawBrief: job.rawBrief, budget: job.budget });
     for (const step of analysis.proposedWorkflow) {
-      const catalogItem = getModelByCapability(step.capabilityNeeded);
+      const catalogItem = resolveCapabilityModel(step.capabilityNeeded, signals);
 
       if (!catalogItem || catalogItem.unitCostUSD === undefined || catalogItem.unitCostUSD === null) {
         missingPriceCapabilities.push(step.capabilityNeeded);

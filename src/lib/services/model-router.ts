@@ -12,6 +12,14 @@ import {
   ModelCapabilityItem,
   getCatalogModelById,
 } from '../models/capability-catalog';
+import {
+  deriveJobSignals,
+  selectControlModel,
+  selectCameraModel,
+  selectShipModel,
+  selectVoiceModel,
+  selectUpscaleModel,
+} from './model-selection';
 
 export class ModelRouter {
   /**
@@ -26,39 +34,9 @@ export class ModelRouter {
     const steps: WorkflowStep[] = [];
     let order = 1;
 
-    // Detect project characteristics
-    const rawBriefLower = (jobContext?.rawBrief || '').toLowerCase();
-    const summaryLower = (analysis.conciseSummary || '').toLowerCase();
-    const deliverables = analysis.deliverables || [];
-    const isVideoProject = deliverables.some(d =>
-      d.type.toLowerCase().includes('video') ||
-      d.type.toLowerCase().includes('reel') ||
-      (d.durationSeconds && d.durationSeconds > 0)
-    );
-    const hasProductReference = (analysis.suppliedAssets && analysis.suppliedAssets.length > 0) ||
-      rawBriefLower.includes('product') ||
-      rawBriefLower.includes('bottle') ||
-      rawBriefLower.includes('can') ||
-      rawBriefLower.includes('packaging') ||
-      rawBriefLower.includes('dish') ||
-      rawBriefLower.includes('food');
-    const isFashionOrPortrait = rawBriefLower.includes('fashion') ||
-      rawBriefLower.includes('editorial') ||
-      rawBriefLower.includes('portrait') ||
-      rawBriefLower.includes('model') ||
-      rawBriefLower.includes('chef') ||
-      rawBriefLower.includes('people');
-    const hasTypographyReqs = deliverables.some(d => d.exactTextRequirements && d.exactTextRequirements.length > 0) ||
-      (analysis.exactText && analysis.exactText.length > 0) ||
-      rawBriefLower.includes('poster') ||
-      rawBriefLower.includes('typography') ||
-      rawBriefLower.includes('logo');
-    const isTalkingOrInterview = rawBriefLower.includes('talking') ||
-      rawBriefLower.includes('interview') ||
-      rawBriefLower.includes('lip sync') ||
-      rawBriefLower.includes('speech');
-    const needsSocialCaptions = deliverables.some(d => d.aspectRatio === '9:16' || d.type.toLowerCase().includes('reel') || d.type.toLowerCase().includes('tiktok'));
-    const isHighTicketLuxury = (jobContext?.budget || 0) >= 2500 || rawBriefLower.includes('luxury') || rawBriefLower.includes('cinematic');
+    // Detect project characteristics (shared with DeterministicEvaluator so pricing matches the plan)
+    const signals = deriveJobSignals(analysis, { rawBrief: jobContext?.rawBrief, budget: jobContext?.budget });
+    const { deliverables, isVideoProject, needsSocialCaptions, hasVoiceRequirement, isTalkingOrInterview } = signals;
 
     // =========================================================================
     // STEP 1: SEARCH ROLE (Rapid Concept Exploration: 8 Concepts -> Choose 2)
@@ -116,24 +94,9 @@ export class ModelRouter {
     // =========================================================================
     // STEP 2: CONTROL ROLE (Product / Identity / Packaging Keyframes)
     // =========================================================================
-    let controlModel: ModelCapabilityItem;
-    let controlReason: string;
+    const { model: controlModel, reason: controlReason } = selectControlModel(signals);
 
-    if (hasProductReference) {
-      controlModel = getCatalogModelById('bytedance-seedream-2')!;
-      controlReason = 'Seedream 2.0 excels at reference conditioning, locking exact product packaging, textures, and geometry against client assets while placing it naturally in lifestyle scenes.';
-    } else if (hasTypographyReqs && !isVideoProject) {
-      controlModel = getCatalogModelById('ideogram-v2.5')!;
-      controlReason = 'Ideogram 2.5 delivers exact typographic spelling and layout composition required by the client headline specifications.';
-    } else if (isFashionOrPortrait) {
-      controlModel = getCatalogModelById('higgsfield-soul-v2')!;
-      controlReason = 'Soul 2.0 HD provides industry-leading human skin texture, editorial lighting taste, and natural portrait depth.';
-    } else {
-      controlModel = getCatalogModelById('bytedance-seedream-2') || getCatalogModelById('higgsfield-soul-v2')!;
-      controlReason = 'Locks foundational lighting, environmental physics, and geometry from the approved Search concepts into high-resolution seed frames.';
-    }
-
-    const controlAlt = hasProductReference
+    const controlAlt = signals.hasProductReference
       ? getCatalogModelById('higgsfield-marketing-studio')!
       : getCatalogModelById('qwen-image-edit-v2')!;
     const controlAttempts = 3;
@@ -182,7 +145,7 @@ export class ModelRouter {
     // STEP 3: CONTROL ROLE (Camera Trajectory Pass - for Video Deliverables)
     // =========================================================================
     if (isVideoProject) {
-      const dopModel = getCatalogModelById('higgsfield-dop-2.5')!;
+      const dopModel = selectCameraModel().model;
       const dopAlt = getCatalogModelById('seedance-fast')!;
       const dopAttempts = 2;
       const dopTotal = Number((dopAttempts * dopModel.unitCostUSD).toFixed(2));
@@ -228,24 +191,7 @@ export class ModelRouter {
     // =========================================================================
     // STEP 4: SHIP ROLE (Final High-Fidelity Client-Facing Asset Synthesis)
     // =========================================================================
-    let shipModel: ModelCapabilityItem;
-    let shipReason: string;
-
-    if (isVideoProject) {
-      if (isTalkingOrInterview) {
-        shipModel = getCatalogModelById('minimax-video-01')!;
-        shipReason = 'MiniMax Video 01 excels at human facial micro-expressions and natural speech cadence.';
-      } else if (isHighTicketLuxury && (jobContext?.budget || 0) >= 3000) {
-        shipModel = getCatalogModelById('google-veo-2') || getCatalogModelById('bytedance-seedance-2.5')!;
-        shipReason = 'Veo 2 / Seedance 2.5 Master delivers elite photorealistic fluid dynamics, atmospheric particle scattering, and cinematic grade matching high-ticket commercial expectations.';
-      } else {
-        shipModel = getCatalogModelById('bytedance-seedance-2.5')!;
-        shipReason = 'ByteDance Seedance 2.5 is the current gold standard for commercial fluid dynamics, realistic cloth/food textures, and high temporal stability.';
-      }
-    } else {
-      shipModel = getCatalogModelById('higgsfield-soul-v2')!;
-      shipReason = 'Renders full-resolution master stills with 10-bit color grading, natural optical bokeh, and immaculate surface details.';
-    }
+    const { model: shipModel, reason: shipReason } = selectShipModel(signals);
 
     const shipAlt = isVideoProject
       ? (getCatalogModelById('kling-1.5-pro') || getCatalogModelById('google-veo-2')!)
@@ -345,16 +291,8 @@ export class ModelRouter {
     // =========================================================================
     // STEP 6: FINISH ROLE (Audio / Voiceover Synthesis - if needed)
     // =========================================================================
-    const hasVoiceRequirement = (analysis.exactText && analysis.exactText.length > 0) ||
-      deliverables.some(d => d.exactTextRequirements && d.exactTextRequirements.length > 0) ||
-      rawBriefLower.includes('voice') ||
-      rawBriefLower.includes('narrat') ||
-      rawBriefLower.includes('audio');
-
     if (hasVoiceRequirement) {
-      const voiceModel = isTalkingOrInterview
-        ? getCatalogModelById('higgsfield-speak-lip-sync')!
-        : getCatalogModelById('elevenlabs-voice-studio')!;
+      const voiceModel = selectVoiceModel(signals).model;
       const voiceAlt = getCatalogModelById('wan-2.1-native-audio')!;
       const voiceAttempts = 2;
       const voiceTotal = Number((voiceAttempts * voiceModel.unitCostUSD).toFixed(2));
@@ -403,7 +341,7 @@ export class ModelRouter {
     // =========================================================================
     // STEP 7: FINISH ROLE (Neural Upscale & 4K Master Export)
     // =========================================================================
-    const upscaleModel = getCatalogModelById('topaz-video-ai-pro') || getCatalogModelById('bytedance-super-res-4k')!;
+    const upscaleModel = selectUpscaleModel().model;
     const upscaleAlt = getCatalogModelById('bytedance-super-res-4k')!;
     const upscaleAttempts = 1;
     const upscaleTotal = Number((upscaleAttempts * upscaleModel.unitCostUSD).toFixed(2));
