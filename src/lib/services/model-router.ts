@@ -118,7 +118,7 @@ export class ModelRouter {
         name: controlAlt.name,
         unitCost: controlAlt.unitCostUSD,
         reason: 'Strong alternative for isolated packshots or direct surgical element inpainting.',
-        tradeoff: 'Slightly more clinical studio look, but zero geometry drift on packaging labels.',
+        tradeoff: 'Slightly more clinical studio look; typically less geometry drift on packaging labels. Check labels at delivery size.',
       },
       availableAlternatives: [
         this.toModelAlternative(controlAlt, 'Surgical packshot isolation'),
@@ -218,12 +218,12 @@ export class ModelRouter {
         unitCost: shipAlt.unitCostUSD,
         reason: isVideoProject
           ? 'Kling 1.5 Pro is the preferred backup if complex multi-character limb interactions or 10-second long takes are needed.'
-          : 'Seedream 2.0 provides tighter vector geometric fidelity if packaging artwork must be 100% pixel-aligned.',
+          : 'Seedream 2.0 usually holds packaging geometry more tightly if artwork must stay aligned to the supplied files.',
         tradeoff: `Difference of $${(shipAlt.unitCostUSD - shipModel.unitCostUSD).toFixed(2)} per attempt; switch if physics simulation needs alternative engine.`,
       },
       availableAlternatives: [
         this.toModelAlternative(shipAlt, 'Complex physics & extended duration takes'),
-        this.toModelAlternative(getCatalogModelById('google-veo-2')!, 'Elite broadcast television optics ($2.20/5s)'),
+        this.toModelAlternative(getCatalogModelById('google-veo-2')!, 'Photorealistic broadcast look ($2.20/5s)'),
         this.toModelAlternative(getCatalogModelById('wan-2.1-native-audio')!, 'Native synchronized audio + motion ($1.65/5s)'),
       ],
       purpose: isVideoProject
@@ -274,12 +274,12 @@ export class ModelRouter {
         this.toModelAlternative(repairAlt, 'Typographic headline repair'),
         this.toModelAlternative(getCatalogModelById('recraft-v3')!, 'Brand logo vector alignment'),
       ],
-      purpose: 'Surgical repair pass to guarantee pristine label typography, seamless continuity, and edge clean-up.',
+      purpose: 'Targeted repair pass for label typography, shot continuity and edge clean-up. Review: labels legible at delivery size, no continuity breaks between shots.',
       inputs: {
         inpaintFeatherPx: 14,
         preservationMask: 'Client logo and packaging label bounding box',
       },
-      expectedOutputs: '1 repaired master plate with 100% verified brand compliance.',
+      expectedOutputs: '1 repaired master plate, checked by the operator against the brand guidelines.',
       estimatedAttempts: repairAttempts,
       unitCost: repairModel.unitCostUSD,
       estimatedTotalCost: repairTotal,

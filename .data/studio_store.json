@@ -2753,7 +2753,7 @@
             "name": "Marketing Studio Image (E-Commerce & Packshots)",
             "unitCost": 0.25,
             "reason": "Strong alternative for isolated packshots or direct surgical element inpainting.",
-            "tradeoff": "Slightly more clinical studio look, but zero geometry drift on packaging labels."
+            "tradeoff": "Slightly more clinical studio look; typically less geometry drift on packaging labels. Check labels at delivery size."
           },
           "availableAlternatives": [
             {
@@ -2875,7 +2875,7 @@
               "id": "google-veo-2",
               "name": "Google Veo 2 (Photorealistic Master)",
               "unitCost": 2.2,
-              "reason": "Elite broadcast television optics ($2.20/5s)",
+              "reason": "Photorealistic broadcast look ($2.20/5s)",
               "tradeoff": "$2.2 per 5s clip (90s queue)"
             },
             {
@@ -2937,12 +2937,12 @@
               "tradeoff": "$0.12 per render (8s queue)"
             }
           ],
-          "purpose": "Surgical repair pass to guarantee pristine label typography, seamless continuity, and edge clean-up.",
+          "purpose": "Targeted repair pass for label typography, shot continuity and edge clean-up. Review: labels legible at delivery size, no continuity breaks between shots.",
           "inputs": {
             "inpaintFeatherPx": 14,
             "preservationMask": "Client logo and packaging label bounding box"
           },
-          "expectedOutputs": "1 repaired master plate with 100% verified brand compliance.",
+          "expectedOutputs": "1 repaired master plate, checked by the operator against the brand guidelines.",
           "estimatedAttempts": 1,
           "unitCost": 0.15,
           "estimatedTotalCost": 0.15,
@@ -3048,7 +3048,7 @@
           "selectedModelId": "subcaption-studio-export",
           "whyItFits": "80%+ of social video views occur with audio muted. Automatically burns in styled kinetic subtitles positioned safely inside Instagram/TikTok UI bounds.",
           "knownFailureMode": "Heavy background music swells can occasionally obscure mumbled or fast speech.",
-          "failureMitigation": "Pass isolated voice stem rather than full stereo mix for 100% transcription accuracy.",
+          "failureMitigation": "Pass the isolated voice stem rather than the full stereo mix to improve transcription accuracy, then proof-read captions.",
           "purpose": "Generate 9:16 vertical cutdowns with animated captions for Reels and TikTok.",
           "inputs": {
             "aspectRatio": "9:16",
@@ -3156,7 +3156,7 @@
           "role": "SHIP",
           "selectedModel": "ByteDance Seedance 2.5 Master (Cinematic Video)",
           "selectedModelId": "bytedance-seedance-2.5",
-          "whyItFits": "ByteDance Seedance 2.5 is the gold standard for commercial fluid dynamics, water droplets, and high temporal stability.",
+          "whyItFits": "ByteDance Seedance 2.5 handles commercial fluid dynamics, water droplets and temporal stability well.",
           "knownFailureMode": "Rapid multi-person movement can occasionally cross limbs in background scenes.",
           "failureMitigation": "Use approved keyframe seed from CONTROL phase.",
           "purpose": "Synthesize final 5-second cinematic motion sequences with realistic fluid physics.",
@@ -3182,12 +3182,12 @@
           "whyItFits": "Self-repair loop triggered: surgically realigns reflection vector on wet basalt without re-rendering expensive 5-second video passes.",
           "knownFailureMode": "Hard edge boundary visible if inpainting mask feathering is below 8px.",
           "failureMitigation": "Feather inpaint mask by 14px.",
-          "purpose": "Surgical repair pass to guarantee pristine reflection vector alignment and label crispness.",
+          "purpose": "Targeted repair pass for reflection alignment and label sharpness. Review: reflections consistent between frames, label legible at delivery size.",
           "inputs": {
             "inpaintFeatherPx": 14,
             "preservationMask": "Bottle puddle contact shadow"
           },
-          "expectedOutputs": "1 repaired master plate with 100% verified reflection continuity.",
+          "expectedOutputs": "1 repaired master plate, reflection continuity checked by the operator.",
           "estimatedAttempts": 1,
           "unitCost": 0.15,
           "estimatedTotalCost": 0.15,
@@ -4247,7 +4247,7 @@
         "type": "intake_question",
         "direction": "outbound",
         "subject": "Quick clarification on wet surface reflections for After the Rain",
-        "body": "Hi Evelyn,\n\nWe love the volcanic basalt concept for Aura Hydrate! To ensure the lighting model renders your bottle with 100% accuracy, could you confirm whether you prefer high-contrast specular reflections on the puddle surface, or a softer matte refraction?\n\nLooking forward to locking this with you!",
+        "body": "Hi Evelyn,\n\nWe love the volcanic basalt concept for Aura Hydrate! To get the lighting on your bottle right, could you confirm whether you prefer high-contrast specular reflections on the puddle surface, or a softer matte refraction?\n\nLooking forward to locking this with you!",
         "status": "sent",
         "channel": "email",
         "isMarketplaceSafeDraft": false,

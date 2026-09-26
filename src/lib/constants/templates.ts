@@ -59,7 +59,7 @@ export const PRODUCTIZED_SERVICE_TEMPLATES: ProductizedServiceTemplate[] = [
       {
         role: 'FINISH',
         modelId: 'elevenlabs-voice-studio',
-        purpose: 'Record cinematic narrative voiceover with pristine studio EQ.',
+        purpose: 'Record cinematic narrative voiceover with clean studio EQ.',
         plannedAttempts: 2,
       },
       {
@@ -148,7 +148,7 @@ export const PRODUCTIZED_SERVICE_TEMPLATES: ProductizedServiceTemplate[] = [
     qualityChecklist: [
       'Hook initiates motion and curiosity within first 1.5 seconds.',
       'Audio volume normalized to -14 LUFS standard for mobile social feeds.',
-      'Subtitles 100% synchronized with spoken audio without word lag.',
+      'Subtitles checked against spoken audio: no visible word lag.',
       'CTA clear and uncluttered in final 3 seconds.'
     ],
     includedRevisions: 1,

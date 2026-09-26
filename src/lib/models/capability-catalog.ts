@@ -246,7 +246,7 @@ export const CAPABILITY_CATALOG: ModelCapabilityItem[] = [
     category: 'image',
     description: 'State-of-the-art typographic layout model capable of rendering precise, legible brand slogans, poster titles, and packaging copy.',
     bestUsedFor: 'Key art posters, hero title cards, headline text on promotional graphics, and table talker cards.',
-    capabilities: ['perfect_typography', 'poster_layout', 'headline_rendering', 'graphic_design'],
+    capabilities: ['typography_rendering', 'poster_layout', 'headline_rendering', 'graphic_design'],
     knownFailureModes: [
       'Struggles with long body copy (>15 words); best suited for 1-6 word punchy headlines.',
       'Script / cursive fonts can occasionally connect unintended ligatures.'
@@ -365,9 +365,9 @@ export const CAPABILITY_CATALOG: ModelCapabilityItem[] = [
     provider: 'Higgsfield',
     role: 'SHIP',
     category: 'video',
-    description: 'Elite cinematic video model with profound understanding of film craft, natural lighting, dialogue pacing, and photorealism.',
+    description: 'Cinematic video model with strong natural lighting, dialogue pacing and photorealism.',
     bestUsedFor: 'Tier-1 luxury brand campaigns, film festivals, broadcast commercial TV spots, and high-ticket hero reels.',
-    capabilities: ['elite_photorealism', 'film_craft_optics', 'dialogue_pacing', 'environmental_coherence'],
+    capabilities: ['photorealism', 'film_craft_optics', 'dialogue_pacing', 'environmental_coherence'],
     knownFailureModes: [
       'Higher queue latency during peak provider load (up to 3-4 minutes per clip).',
       'Premium unit cost ($2.20/5s) impacts gross margin on lower-budget jobs.'
@@ -502,9 +502,9 @@ export const CAPABILITY_CATALOG: ModelCapabilityItem[] = [
     provider: 'Partner',
     role: 'FINISH',
     category: 'voice',
-    description: 'Gold-standard narrative voice synthesis offering profound emotional nuance, realistic breath pauses, and pristine 24-bit 48kHz WAV audio.',
+    description: 'Narrative voice synthesis with emotional range, realistic breath pauses and 24-bit 48kHz WAV output.',
     bestUsedFor: 'Cinematic brand voiceovers, documentary narrations, character dialogue, and promotional voice tracks.',
-    capabilities: ['cinematic_voiceover', 'emotional_nuance', 'pristine_master_audio', 'pacing_control'],
+    capabilities: ['cinematic_voiceover', 'emotional_nuance', 'master_audio_48k', 'pacing_control'],
     knownFailureModes: [
       'Niche brand names or local Island dialects can be mispronounced without phonetic spelling guides.',
       'Extreme high-energy shouting can clip if output gain is uncompressed.'
@@ -553,7 +553,7 @@ export const CAPABILITY_CATALOG: ModelCapabilityItem[] = [
     knownFailureModes: [
       'Heavy background music swells can occasionally obscure mumbled or fast speech.'
     ],
-    failureMitigation: 'Pass isolated voice stem rather than full stereo mix for 100% transcription accuracy.',
+    failureMitigation: 'Pass the isolated voice stem rather than the full stereo mix to improve transcription accuracy, then proof-read captions.',
     unitCostUSD: 0.15,
     costUnit: 'per render',
     avgAttempts: 1.1,

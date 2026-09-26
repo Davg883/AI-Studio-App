@@ -99,13 +99,13 @@ export function selectControlModel(s: JobSignals): ModelChoice {
   if (s.hasTypographyReqs && !s.isVideoProject) {
     return {
       model: must('ideogram-v2.5'),
-      reason: 'Ideogram 2.5 delivers exact typographic spelling and layout composition required by the client headline specifications.',
+      reason: 'Ideogram 2.5 is strong at rendering headline text and layout. Proof-read every word before delivery.',
     };
   }
   if (s.isFashionOrPortrait) {
     return {
       model: must('higgsfield-soul-v2'),
-      reason: 'Soul 2.0 HD provides industry-leading human skin texture, editorial lighting taste, and natural portrait depth.',
+      reason: 'Soul 2.0 HD is strong on human skin texture, editorial lighting and natural portrait depth.',
     };
   }
   return {
@@ -137,18 +137,18 @@ export function selectShipModel(s: JobSignals): ModelChoice {
       return {
         model: getCatalogModelById('google-veo-2') || must('bytedance-seedance-2.5'),
         reason:
-          'Veo 2 / Seedance 2.5 Master delivers elite photorealistic fluid dynamics, atmospheric particle scattering, and cinematic grade matching high-ticket commercial expectations.',
+          'Veo 2 / Seedance 2.5 Master suit photorealistic fluid dynamics, atmospheric particles and cinematic grading for higher-budget briefs.',
       };
     }
     return {
       model: must('bytedance-seedance-2.5'),
       reason:
-        'ByteDance Seedance 2.5 is the current gold standard for commercial fluid dynamics, realistic cloth/food textures, and high temporal stability.',
+        'ByteDance Seedance 2.5 handles commercial fluid dynamics, cloth/food textures and temporal stability well.',
     };
   }
   return {
     model: must('higgsfield-soul-v2'),
-    reason: 'Renders full-resolution master stills with 10-bit color grading, natural optical bokeh, and immaculate surface details.',
+    reason: 'Renders full-resolution master stills. Check surface detail and colour at delivery size.',
   };
 }
 

@@ -241,7 +241,7 @@ store['clientMessages'][rain_id] = [
         "type": "intake_question",
         "direction": "outbound",
         "subject": "Quick clarification on wet surface reflections for After the Rain",
-        "body": "Hi Evelyn,\n\nWe love the volcanic basalt concept for Aura Hydrate! To ensure the lighting model renders your bottle with 100% accuracy, could you confirm whether you prefer high-contrast specular reflections on the puddle surface, or a softer matte refraction?\n\nLooking forward to locking this with you!",
+        "body": "Hi Evelyn,\n\nWe love the volcanic basalt concept for Aura Hydrate! To get the lighting on your bottle right, could you confirm whether you prefer high-contrast specular reflections on the puddle surface, or a softer matte refraction?\n\nLooking forward to locking this with you!",
         "status": "sent",
         "channel": "email",
         "isMarketplaceSafeDraft": False,
