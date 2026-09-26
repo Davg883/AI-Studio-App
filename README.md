@@ -40,12 +40,17 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
    - Operators can review and edit the analysis side by side with the original. Re-analysis is locked once the plan and budget are approved.
 
 3. **Higgsfield Multi-Model Production Planner**:
-   - Automated workflow builder utilizing:
-     - **Higgsfield Concept Keyframe Pro**: Photorealistic master base stills.
-     - **Higgsfield DoP 2.5 (Director of Photography)**: Precision orbital push-ins, crane shots, and steadicam trajectory.
-     - **Higgsfield Cinematic Motion V3**: Generative fluid video scene synthesis.
-     - **ElevenLabs Voice Studio Ultra**: Broadcast narrative voiceover stems.
-     - **Higgsfield Neural Master 4K & Denoise**: 4K upscaling, optical deblur, and Kodak 35mm grain matching.
+   - The workflow builder (`ModelRouter`) picks models by production role from the 22-model capability catalogue in `src/lib/models/capability-catalog.ts` (browsable in the app via **Capability Catalog**):
+
+     | Role | Purpose | Models |
+     |---|---|---|
+     | **SEARCH** | Cheap, fast concept exploration | Flux 1.1 Schnell, Wan 2.1 Fast / Lite, ByteDance Seedance 2.5 Fast, PixVerse V3 Fast Lane, LTX Video High-Speed Animatics |
+     | **CONTROL** | Product / identity keyframes, camera moves, repairs | ByteDance Seedream 2.0, Marketing Studio Image, Qwen Image Edit / Inpaint Pro, Ideogram 2.5, Recraft V3, Higgsfield DoP 2.5 (Director of Photography) |
+     | **SHIP** | Final client-facing synthesis | ByteDance Seedance 2.5 Master, Kling 1.5 Pro, Google Veo 2, Higgsfield Soul 2.0 HD, MiniMax Video 01 (Hailuo), Wan 2.1 Native Audio-Video |
+     | **FINISH** | Voice, upscaling, captions | ElevenLabs Voice Studio Ultra\*, Higgsfield Speak / Lip-Sync Pro, Topaz Video AI Pro\*, ByteDance Neural Super-Resolution 4K, SubCaption Studio AI\* |
+
+     \* Partner tools; all others are accessed through Higgsfield.
+   - A typical chain: SEARCH concepts (8 variants → operator picks 2) → CONTROL keyframes → CONTROL DoP camera pass (video jobs) → SHIP master → CONTROL repair fallback → FINISH voiceover (if needed) → FINISH upscale → FINISH captions & safe-zone cutdowns (vertical deliverables). Each step lists alternatives the operator can swap in.
 
 4. **Profitability & Unit Economics Panel**:
    - Margin cascade: Client Contract Price, Higgsfield GPU Spend, Iteration Contingency Buffer (default 15%), Marketplace Channel Fee, Operator Labour, and Expected Gross Margin (% and $).
