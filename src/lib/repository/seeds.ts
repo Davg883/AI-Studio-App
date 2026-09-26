@@ -3,6 +3,7 @@ import { Job, BriefAnalysis, Workflow, Generation, Revision } from '@/types';
 export const SEED_JOBS: Job[] = [
   {
     id: 'job-aethelgard-01',
+    isDemo: true,
     title: 'Aethelgard: The Obsidian Horizon Concept Film',
     clientName: 'Maison de L’Ombre (Nordic Luxury Fragrance)',
     source: 'Upwork',
@@ -45,12 +46,12 @@ Visual Direction & World-building:
     approvalCheckpoints: {
       workflowApproved: true,
       workflowApprovedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-      workflowApprovedBy: 'Operator (David)',
+      workflowApprovedBy: 'Demo seed',
       maxBudgetApproved: true,
       maxBudgetAmount: 65,
       rightsCleared: true,
       rightsApprovedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
-      rightsApprovedBy: 'Operator (David)',
+      rightsApprovedBy: 'Demo seed',
       finalDeliveryApproved: false, // In QA, awaiting final human sign-off
     },
     createdAt: new Date(Date.now() - 4 * 86400000).toISOString(),
@@ -58,6 +59,7 @@ Visual Direction & World-building:
   },
   {
     id: 'job-crispvolt-02',
+    isDemo: true,
     title: 'CrispVolt: 15s Kinetic Electrolyte Energy Loop',
     clientName: 'Volt Labs Nutrition',
     source: 'Contra',
@@ -93,6 +95,7 @@ We need a viral, hyper-kinetic 15-second 9:16 vertical motion spot for our new C
   },
   {
     id: 'job-apex-03',
+    isDemo: true,
     title: 'Apex Kinetic: Zero-G Running Shoe Teaser',
     clientName: 'Strata Performance Gear',
     source: 'Direct Lead',
@@ -434,7 +437,7 @@ export const SEED_WORKFLOWS: Record<string, Workflow> = {
     ],
     totalEstimatedCost: 14.17,
     approvalStatus: 'Approved',
-    approvedBy: 'Operator (David)',
+    approvedBy: 'Demo seed',
     approvedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
     maxApprovedSpend: 65,
     notes: 'Approved with $65 production buffer. All 5 generation steps finished successfully.',

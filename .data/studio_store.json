@@ -15,12 +15,12 @@
       "approvalCheckpoints": {
         "workflowApproved": true,
         "workflowApprovedAt": "2026-09-25T12:43:12.069214Z",
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetApproved": true,
         "maxBudgetAmount": 25,
         "rightsCleared": true,
         "rightsApprovedAt": "2026-09-25T12:43:12.069214Z",
-        "rightsApprovedBy": "David (Human Operator)",
+        "rightsApprovedBy": "Demo seed",
         "finalDeliveryApproved": false,
         "finalDeliveryApprovedBy": null,
         "finalDeliveryApprovedAt": "2026-09-25T12:18:42.718Z"
@@ -87,7 +87,8 @@
       ],
       "createdAt": "2026-09-25T12:43:12.069214Z",
       "updatedAt": "2026-09-25T12:43:12.069214Z",
-      "activeBlocker": "Awaiting human operator sign-off and deliverable verification"
+      "activeBlocker": "Awaiting human operator sign-off and deliverable verification",
+      "isDemo": true
     },
     {
       "id": "job-garlic-farm",
@@ -104,12 +105,12 @@
       "approvalCheckpoints": {
         "workflowApproved": true,
         "workflowApprovedAt": "2026-09-25T12:43:12.069214Z",
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetApproved": true,
         "maxBudgetAmount": 35,
         "rightsCleared": true,
         "rightsApprovedAt": "2026-09-25T12:43:12.069214Z",
-        "rightsApprovedBy": "David (Human Operator)",
+        "rightsApprovedBy": "Demo seed",
         "finalDeliveryApproved": false
       },
       "activeStage": "authorise",
@@ -137,7 +138,8 @@
         }
       ],
       "createdAt": "2026-09-25T12:43:12.069214Z",
-      "updatedAt": "2026-09-25T12:43:12.069214Z"
+      "updatedAt": "2026-09-25T12:43:12.069214Z",
+      "isDemo": true
     },
     {
       "id": "job-after-the-rain",
@@ -171,12 +173,12 @@
       "approvalCheckpoints": {
         "workflowApproved": true,
         "workflowApprovedAt": "2026-09-25T11:34:22.160617Z",
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetApproved": true,
         "maxBudgetAmount": 45,
         "rightsCleared": true,
         "rightsApprovedAt": "2026-09-25T11:34:22.160617Z",
-        "rightsApprovedBy": "David (Human Operator)",
+        "rightsApprovedBy": "Demo seed",
         "finalDeliveryApproved": false
       },
       "createdAt": "2026-09-25T11:34:22.160617Z",
@@ -307,7 +309,8 @@
         "calculatedMarginPct": 99.4,
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-25T11:35:02.585213Z"
-      }
+      },
+      "isDemo": true
     },
     {
       "id": "job-night-orchard",
@@ -432,7 +435,8 @@
         "calculatedMarginPct": 99.4,
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-25T11:35:02.585213Z"
-      }
+      },
+      "isDemo": true
     },
     {
       "id": "job-garlic-farm-trail",
@@ -600,7 +604,8 @@
         "calculatedMarginPct": 96.7,
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
-      }
+      },
+      "isDemo": true
     },
     {
       "id": "job-appley-manor-sprint",
@@ -766,7 +771,8 @@
         "calculatedMarginPct": 96.6,
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
-      }
+      },
+      "isDemo": true
     },
     {
       "id": "job-appley-cafe-pilot",
@@ -796,7 +802,7 @@
         "rightsCleared": true,
         "finalDeliveryApproved": false,
         "workflowApprovedAt": "2026-09-25T00:05:14.722Z",
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetAmount": 25
       },
       "createdAt": "2026-09-24T16:26:24.742771Z",
@@ -937,7 +943,8 @@
         "calculatedMarginPct": 97.5,
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
-      }
+      },
+      "isDemo": true
     },
     {
       "title": "Solstice Electric GT - 30s Reveal",
@@ -957,7 +964,7 @@
         "rightsCleared": false,
         "finalDeliveryApproved": false,
         "workflowApprovedAt": "2026-09-24T15:52:38.716Z",
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetAmount": 60
       },
       "id": "job-mufpnh6u-cwsf",
@@ -1239,7 +1246,8 @@
         ],
         "rationale": "Human Review Required: Missing critical client assets (High-resolution transparent vector SVG brand logo, Approved finalized voiceover script document). Inquire before locking workflow."
       },
-      "maxApprovedBudget": 61.8
+      "maxApprovedBudget": 61.8,
+      "isDemo": true
     },
     {
       "id": "job-apex-03",
@@ -1261,7 +1269,8 @@
         "finalDeliveryApproved": false
       },
       "createdAt": "2026-09-24T15:29:30.199Z",
-      "updatedAt": "2026-09-24T15:29:30.199Z"
+      "updatedAt": "2026-09-24T15:29:30.199Z",
+      "isDemo": true
     },
     {
       "id": "job-crispvolt-02",
@@ -1291,7 +1300,8 @@
         "finalDeliveryApproved": false
       },
       "createdAt": "2026-09-23T15:29:30.199Z",
-      "updatedAt": "2026-09-23T15:29:30.199Z"
+      "updatedAt": "2026-09-23T15:29:30.199Z",
+      "isDemo": true
     },
     {
       "id": "job-aethelgard-01",
@@ -1325,16 +1335,17 @@
       "approvalCheckpoints": {
         "workflowApproved": true,
         "workflowApprovedAt": "2026-09-21T15:29:30.199Z",
-        "workflowApprovedBy": "Operator (David)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetApproved": true,
         "maxBudgetAmount": 65,
         "rightsCleared": true,
         "rightsApprovedAt": "2026-09-21T15:29:30.199Z",
-        "rightsApprovedBy": "Operator (David)",
+        "rightsApprovedBy": "Demo seed",
         "finalDeliveryApproved": false
       },
       "createdAt": "2026-09-20T15:29:30.199Z",
-      "updatedAt": "2026-09-23T15:29:30.199Z"
+      "updatedAt": "2026-09-23T15:29:30.199Z",
+      "isDemo": true
     }
   ],
   "analyses": {
@@ -2491,7 +2502,7 @@
       ],
       "totalEstimatedCost": 14.17,
       "approvalStatus": "Approved",
-      "approvedBy": "Operator (David)",
+      "approvedBy": "Demo seed",
       "approvedAt": "2026-09-21T15:29:30.199Z",
       "maxApprovedSpend": 65,
       "notes": "Approved with $65 production buffer. All 5 generation steps finished successfully."
@@ -2660,7 +2671,7 @@
       "approvalStatus": "Approved",
       "maxApprovedSpend": 60,
       "notes": "Initial workflow auto-generated by Studio Operator Planner. Requires human approval before execution.",
-      "approvedBy": "David (Human Operator)",
+      "approvedBy": "Demo seed",
       "approvedAt": "2026-09-24T15:52:38.716Z"
     },
     "job-appley-cafe-pilot": {
@@ -3054,7 +3065,7 @@
       "approvalStatus": "Approved",
       "maxApprovedSpend": 25,
       "notes": "Transparent Model Route proposed by Studio Operator based on hospitality_launch_campaign. Human operator approval required before running initial paid workflow or committing GPU spend. [Step step-4 overridden to Google Veo 2 (Photorealistic Master)]",
-      "approvedBy": "David (Human Operator)",
+      "approvedBy": "Demo seed",
       "approvedAt": "2026-09-25T00:05:14.722Z"
     },
     "job-after-the-rain": {
@@ -3252,7 +3263,7 @@
       ],
       "totalEstimatedCost": 13.8,
       "approvalStatus": "Approved",
-      "approvedBy": "David (Human Operator)",
+      "approvedBy": "Demo seed",
       "approvedAt": "2026-09-25T11:35:02.585213Z",
       "maxApprovedSpend": 45,
       "notes": "Launch Video productized workflow. Human approved. Autonomous self-repair and revision applied."
@@ -3756,7 +3767,7 @@
       "clientDispute": true
     },
     "updatedAt": "2026-09-25T11:34:22.160617Z",
-    "updatedBy": "David (Human Operator)"
+    "updatedBy": "Demo seed"
   },
   "clientMemory": {
     "client-luminary-botanicals": {

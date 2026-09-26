@@ -45,7 +45,7 @@ store['autonomySettings'] = {
         "clientDispute": True
     },
     "updatedAt": now_iso,
-    "updatedBy": "David (Human Operator)"
+    "updatedBy": "Demo seed"
 }
 
 # 2. Client Memory
@@ -175,6 +175,7 @@ existing_job_idx = next((i for i, j in enumerate(store['jobs']) if j['id'] == ra
 
 rain_job = {
     "id": rain_id,
+    "isDemo": True,
     "title": "After the Rain: 15s Luxury Commercial Reveal",
     "clientName": "Luminary Botanicals (Evelyn Thorne)",
     "source": "Direct Lead",
@@ -212,12 +213,12 @@ rain_job = {
     "approvalCheckpoints": {
         "workflowApproved": True,
         "workflowApprovedAt": now_iso,
-        "workflowApprovedBy": "David (Human Operator)",
+        "workflowApprovedBy": "Demo seed",
         "maxBudgetApproved": True,
         "maxBudgetAmount": 45.0,
         "rightsCleared": True,
         "rightsApprovedAt": now_iso,
-        "rightsApprovedBy": "David (Human Operator)",
+        "rightsApprovedBy": "Demo seed",
         "finalDeliveryApproved": False  # Crucial guardrail test: pauses before final release!
     },
     "createdAt": now_iso,
@@ -447,6 +448,7 @@ existing_orchard_idx = next((i for i, j in enumerate(store['jobs']) if j['id'] =
 
 orchard_job = {
     "id": orchard_id,
+    "isDemo": True,
     "title": "Night Orchard: Twilight Canopy Reveal",
     "clientName": "Cider & Stone Heritage Estate (Arthur Pendelton)",
     "source": "Direct Lead",

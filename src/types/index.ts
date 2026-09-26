@@ -62,6 +62,8 @@ export interface Job {
   laborHoursActual?: number;
   laborRatePerHourUSD?: number;
   verifiedDeliverables?: import('./autonomy').VerifiedDeliverable[];
+  /** Seeded / demonstration scenario, not a commissioned job; approvals on it are not real */
+  isDemo?: boolean;
   // Computed by the jobs list API (not persisted): brief analysis has an unresolved high-severity rights concern
   hasOpenRightsIssue?: boolean;
   // Computed by the jobs list API (not persisted): every workflow step is completed or skipped

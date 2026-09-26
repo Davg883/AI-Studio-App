@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Job } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Badge } from '../ui/badge';
-import { ArrowLeft, Clock, DollarSign, ExternalLink, Calendar, Building, Globe } from 'lucide-react';
+import { ArrowLeft, Clock, DollarSign, ExternalLink, Calendar, Building, Globe, FlaskConical } from 'lucide-react';
 
 interface JobHeaderProps {
   job: Job;
@@ -31,6 +31,18 @@ export function JobHeader({ job }: JobHeaderProps) {
 
   return (
     <div className="border-b border-zinc-800 bg-zinc-950/60 pb-4 pt-2">
+      {job.isDemo && (
+        <div
+          role="note"
+          className="mb-3 flex items-start gap-2 rounded-md border border-sky-800/60 bg-sky-950/30 px-3 py-2 text-xs text-sky-100"
+        >
+          <FlaskConical className="h-4 w-4 shrink-0 text-sky-300" />
+          <span>
+            <strong className="font-semibold">Demonstration scenario.</strong> Not a commissioned job: statuses,
+            approvals and figures are seeded example data.
+          </span>
+        </div>
+      )}
       {/* Top back button row */}
       <div className="flex items-center justify-between mb-3">
         <Link
@@ -42,6 +54,11 @@ export function JobHeader({ job }: JobHeaderProps) {
         </Link>
 
         <div className="flex items-center gap-2">
+          {job.isDemo && (
+            <Badge variant="outline" className="border-sky-700 text-sky-300">
+              Demo
+            </Badge>
+          )}
           {getStatusBadge(job.status)}
           <Badge variant="outline" className="text-zinc-400">
             ID: {job.id}

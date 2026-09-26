@@ -31,6 +31,27 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string>('All');
   const [waitingOnly, setWaitingOnly] = useState(false);
+  const [hideDemo, setHideDemo] = useState(false);
+
+  // Per-viewer preference: remember whether demo scenarios are hidden
+  useEffect(() => {
+    try {
+      setHideDemo(window.localStorage.getItem('studio.hideDemo') === '1');
+    } catch {
+      // storage unavailable: default to showing demo jobs
+    }
+  }, []);
+  const toggleHideDemo = () => {
+    setHideDemo(prev => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem('studio.hideDemo', next ? '1' : '0');
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -64,14 +85,17 @@ export default function DashboardPage() {
     return () => clearInterval(timer);
   }, [anyGenerating, fetchJobs]);
 
+  const visibleJobs = useMemo(() => (hideDemo ? jobs.filter(j => !j.isDemo) : jobs), [jobs, hideDemo]);
+  const demoCount = jobs.filter(j => j.isDemo).length;
+
   const needsYou = useMemo(
-    () => jobs.filter(j => getJobState(j).waitingOn).sort(urgencyCompare),
-    [jobs]
+    () => visibleJobs.filter(j => getJobState(j).waitingOn).sort(urgencyCompare),
+    [visibleJobs]
   );
 
   const filteredJobs = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    return jobs
+    return visibleJobs
       .filter(job => {
         const matchesSearch =
           job.title.toLowerCase().includes(q) ||
@@ -82,7 +106,7 @@ export default function DashboardPage() {
         return matchesSearch && matchesSource && matchesWaiting;
       })
       .sort(urgencyCompare);
-  }, [jobs, searchQuery, sourceFilter, waitingOnly]);
+  }, [visibleJobs, searchQuery, sourceFilter, waitingOnly]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-5">
@@ -122,7 +146,10 @@ export default function DashboardPage() {
                     className="group flex items-center justify-between gap-3 rounded-md border border-zinc-800 bg-zinc-950/70 px-3 py-2 hover:border-amber-700/60 transition-colors"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate text-sm text-zinc-100">{job.title}</span>
+                      <span className="block truncate text-sm text-zinc-100">
+                        {job.isDemo && <span className="mr-1.5 text-xs text-sky-300">[Demo]</span>}
+                        {job.title}
+                      </span>
                       <span className="block text-xs text-amber-300">
                         {state.waitingOn}
                         <span className={days !== null && days <= 3 ? 'text-red-300' : 'text-zinc-400'}>
@@ -148,7 +175,7 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <MetricCards jobs={jobs} waitingOnly={waitingOnly} onToggleWaitingOnly={() => setWaitingOnly(w => !w)} />
+        <MetricCards jobs={visibleJobs} waitingOnly={waitingOnly} onToggleWaitingOnly={() => setWaitingOnly(w => !w)} />
       )}
 
       {/* Filters */}
@@ -166,6 +193,20 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+          {demoCount > 0 && (
+            <button
+              onClick={toggleHideDemo}
+              aria-pressed={hideDemo}
+              className={`rounded-full border px-2.5 py-1 transition-colors ${
+                hideDemo
+                  ? 'border-sky-700 bg-sky-950/40 text-sky-200'
+                  : 'border-zinc-800 text-zinc-400 hover:text-zinc-200'
+              }`}
+              title="Demo scenarios are seeded example jobs, not commissioned work"
+            >
+              {hideDemo ? `Demo jobs hidden (${demoCount})` : 'Hide demo jobs'}
+            </button>
+          )}
           {waitingOnly && (
             <button
               onClick={() => setWaitingOnly(false)}

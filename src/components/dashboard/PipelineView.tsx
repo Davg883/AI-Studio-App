@@ -133,9 +133,20 @@ export function PipelineView({ jobs }: PipelineViewProps) {
                     >
                       {/* Top row: Source badge & Budget */}
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Badge variant={getSourceBadgeVariant(job.source) as any} className="text-xs">
-                          {job.source}
-                        </Badge>
+                        <span className="flex items-center gap-1.5">
+                          <Badge variant={getSourceBadgeVariant(job.source) as any} className="text-xs">
+                            {job.source}
+                          </Badge>
+                          {job.isDemo && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs border-sky-800 text-sky-300"
+                              title="Demonstration scenario, not a commissioned job"
+                            >
+                              Demo
+                            </Badge>
+                          )}
+                        </span>
                         <span className="text-sm font-mono font-semibold text-emerald-400">
                           {formatCurrency(job.budget)}
                         </span>

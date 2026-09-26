@@ -268,7 +268,7 @@ rain_wf = {
     ],
     "totalEstimatedCost": 13.80,
     "approvalStatus": "Approved",
-    "approvedBy": "David (Human Operator)",
+    "approvedBy": "Demo seed",
     "approvedAt": now_iso,
     "maxApprovedSpend": 45.0,
     "notes": "Launch Video productized workflow. Human approved. Autonomous self-repair and revision applied."
