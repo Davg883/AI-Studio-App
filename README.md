@@ -18,6 +18,7 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
    - If the brief analysis detects a high-severity rights concern (trademarked logos, soundalike music, likeness issues), execution is halted until the human operator clears or mitigates the risk.
 3. **Checkpoint 3: Autonomous Run Inside Spend Limits**
    - After approval, the agent operates autonomously strictly within the approved ceiling. Any budget increase, material workflow change, or parameter shift automatically halts execution until operator sign-off.
+   - **Concept selection:** the SEARCH step explores rough concepts, then production stops until the operator chooses up to 2 to carry forward. This is enforced on the server: *Run All* pauses after the concept step, later steps return `409` until a choice is recorded, and re-rolling the concept step re-locks them.
 4. **Checkpoint 4: Revisions & Incremental Costs**
    - Client feedback notes are recorded with affected deliverables, recommended actions, and expected incremental costs, requiring operator sign-off before re-rendering.
 5. **Checkpoint 5: Signed Final Delivery**
@@ -29,6 +30,7 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
 
 1. **Intake Engine**:
    - Manually ingest brief, budget, deadline, inbound source, and reference assets.
+   - Client prices are quoted in **GBP** by default (USD selectable per job).
    - Channel fee presets per source (Upwork: 10%, Fiverr: 20%, Contra / Email / Direct Lead: 0%), editable at intake for negotiated fees.
    - Live preview of the channel fee and what you keep before production costs.
    - Duplicate guard: creating an open job with the same title, client and brief returns `409` with a link to the existing job.
@@ -52,9 +54,12 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
      \* Partner tools; all others are accessed through Higgsfield.
    - A typical chain: SEARCH concepts (8 variants → operator picks 2) → CONTROL keyframes → CONTROL DoP camera pass (video jobs) → SHIP master → CONTROL repair fallback → FINISH voiceover (if needed) → FINISH upscale → FINISH captions & safe-zone cutdowns (vertical deliverables). Each step lists alternatives the operator can swap in.
 
-4. **Profitability & Unit Economics Panel**:
-   - Margin cascade: Client Contract Price, Higgsfield GPU Spend, Iteration Contingency Buffer (default 15%), Marketplace Channel Fee, Operator Labour, and Expected Gross Margin (% and $).
-   - One server-side calculation (`CostCalculator`) feeds every margin figure in the app, so the job summary, plan and profitability panel always agree.
+4. **Contribution Panel**:
+   - **Contribution** = client price − generation estimate − contingency (default 15%) − channel fee − operator labour. It excludes overheads, software subscriptions and tax, so it is deliberately not called profit.
+   - Shown as **Incomplete** until operator labour (hours × rate, entered in the panel) and a production workflow are costed, so a missing cost never reads as a high margin.
+   - Provider spend is shown three ways: **estimated**, **simulated** (mock runs, never billed) and **billed** (live runs).
+   - Client figures are in the job's currency; provider costs stay in USD and are converted at `USD_TO_GBP_RATE` for contribution (an assumed 0.75 is used, and labelled as assumed, when unset).
+   - One server-side calculation (`CostCalculator`) feeds every figure, so the job summary, plan and costs views always agree.
 
 5. **Operations Dashboard**:
    - **Needs you now**: the most urgent jobs waiting on the operator, with deadlines.
@@ -71,14 +76,14 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
      - `Rejected`: Scope/budget mismatch.
 
 6. **Job Workspace**:
-   - A summary strip shows the current stage, the next action, the active blocker, the remaining spend against the cap, and the expected margin.
+   - A summary strip shows the current stage, the next action, the active blocker, the remaining provider spend against the cap, and the expected contribution (or "Contribution incomplete").
    - The **next action is a button** that jumps to where it is carried out, and the page opens on that stage.
    - A single six-stage navigation (**Brief → Plan → Authorise → Produce → Review → Deliver**) marks stages as done, current or upcoming and hosts every view:
 
      | Stage | Views |
      |---|---|
      | Brief | Brief & open questions · Astra decision · Review analysis |
-     | Plan | Workflow · Costs & margins |
+     | Plan | Workflow · Costs & margins (contribution) |
      | Authorise | Approval checkpoints · Client messages |
      | Produce | Rendered outputs |
      | Review | Revisions · QA repairs · Feedback interpreter |
@@ -116,7 +121,9 @@ The operator manually pastes client briefs from Upwork, Fiverr, Contra, email, o
 | Path | Purpose |
 |---|---|
 | `src/lib/job-state.ts` | Derived job state: stages, next action, blockers, deadlines |
-| `src/lib/services/cost-calculator.ts` | Single margin calculation (incl. operator labour) |
+| `src/lib/services/cost-calculator.ts` | Single contribution calculation (labour, currency, simulated vs billed) |
+| `src/lib/money.ts` | Currency rules: GBP quotations, USD provider costs, conversion |
+| `src/lib/concept-gate.ts` | Concept-selection checkpoint shared by the API and UI |
 | `src/lib/operator.ts` | Operator identity (env default + per-browser override) |
 | `src/components/job-detail/WorkflowStageWorkspace.tsx` | Job summary strip, stage navigation, signed delivery |
 | `src/components/dashboard/PipelineView.tsx` | Kanban board with urgency and collapsible columns |
@@ -145,7 +152,10 @@ NEXT_PUBLIC_APP_ENV=development
 NEXT_PUBLIC_OPERATOR_NAME=
 DEFAULT_CHANNEL_FEE_PCT=10
 DEFAULT_CONTINGENCY_PCT=15
+USD_TO_GBP_RATE=
 ```
+
+- `USD_TO_GBP_RATE` converts provider costs (billed in USD) into GBP for contribution. Set it to your current rate; until then the app uses 0.75 and labels it as assumed.
 
 - `NEXT_PUBLIC_OPERATOR_NAME` sets the default name recorded on approvals (falls back to *Studio Operator*). Each browser can override it from the **Studio** menu.
 - To run live, set `MOCK_MODE=false` and add the Higgsfield / OpenAI keys. The header switches to **Live mode**.
@@ -168,6 +178,8 @@ BASE_URL=http://localhost:3001 node test-e2e.mjs
 ---
 
 ## 🎬 Pre-loaded Seed Demonstrations
+
+All seeded jobs are **demonstration scenarios**, not commissioned work. They carry a *Demo* badge and a banner on the job page, their approvals are attributed to "Demo seed", and the dashboard can hide them (**Hide demo jobs**). Jobs created through intake are never marked as demo.
 
 1. **Aethelgard: The Obsidian Horizon Concept Film** (Upwork, $4,200)
    - Status: `QA`
