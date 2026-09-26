@@ -1,6 +1,7 @@
 import { ValidatedBriefAnalysis } from '../schemas/brief-analysis-schema';
 import { Job, AnalysisDecision } from '@/types';
 import { deriveJobSignals, resolveCapabilityModel } from './model-selection';
+import { jobCurrency, usdToClientRate } from '../money';
 
 export interface DeterministicEvaluationResult {
   decision: AnalysisDecision;
@@ -24,7 +25,7 @@ export interface DeterministicEvaluationResult {
 
 export class DeterministicEvaluator {
   static evaluate(
-    job: Pick<Job, 'budget' | 'deadline' | 'source' | 'channelFeePct' | 'contingencyPct' | 'referenceAssets' | 'rawBrief'>,
+    job: Pick<Job, 'budget' | 'deadline' | 'source' | 'channelFeePct' | 'contingencyPct' | 'referenceAssets' | 'rawBrief' | 'currency'>,
     analysis: ValidatedBriefAnalysis
   ): DeterministicEvaluationResult {
     const reasons: string[] = [];
@@ -71,9 +72,13 @@ export class DeterministicEvaluator {
     const channelFeePct = job.channelFeePct ?? 10;
     const clientBudget = job.budget || 0;
 
-    const contingencyAmount = Number(((totalProductionCost * contingencyPct) / 100).toFixed(2));
+    // Provider costs are USD; the client price is in the job's currency. Convert before comparing.
+    // (calculatedProductionCost stays in USD as provider spend; margin figures below exclude labour.)
+    const fx = usdToClientRate(jobCurrency(job)).rate;
+    const productionCostClient = Number((totalProductionCost * fx).toFixed(2));
+    const contingencyAmount = Number(((productionCostClient * contingencyPct) / 100).toFixed(2));
     const channelFeeAmount = Number(((clientBudget * channelFeePct) / 100).toFixed(2));
-    const totalCost = Number((totalProductionCost + contingencyAmount + channelFeeAmount).toFixed(2));
+    const totalCost = Number((productionCostClient + contingencyAmount + channelFeeAmount).toFixed(2));
 
     const expectedGrossMargin = Number((clientBudget - totalCost).toFixed(2));
     const expectedMarginPct = clientBudget > 0

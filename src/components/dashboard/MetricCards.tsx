@@ -3,6 +3,7 @@ import { Job } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import { DollarSign, ShieldAlert, Film, TrendingUp } from 'lucide-react';
 import { getJobState } from '@/lib/job-state';
+import { formatMoney, jobCurrency } from '@/lib/money';
 
 interface MetricCardsProps {
   jobs: Job[];
@@ -11,7 +12,15 @@ interface MetricCardsProps {
 }
 
 export function MetricCards({ jobs, waitingOnly, onToggleWaitingOnly }: MetricCardsProps) {
-  const totalPipelineBudget = jobs.reduce((sum, j) => sum + (j.budget || 0), 0);
+  // Totals per currency: client prices in different currencies are never summed together
+  const totalsByCurrency = jobs.reduce<Record<string, { total: number; count: number }>>((acc, j) => {
+    const c = jobCurrency(j);
+    acc[c] ??= { total: 0, count: 0 };
+    acc[c].total += j.budget || 0;
+    acc[c].count += 1;
+    return acc;
+  }, {});
+  const currencyTotals = Object.entries(totalsByCurrency).sort(([a], [b]) => (a === 'GBP' ? -1 : b === 'GBP' ? 1 : a.localeCompare(b)));
 
   // Same rule as the "waiting on" label on each pipeline card
   const pendingHumanApprovals = jobs.filter(j => getJobState(j).waitingOn !== null).length;
@@ -32,12 +41,19 @@ export function MetricCards({ jobs, waitingOnly, onToggleWaitingOnly }: MetricCa
         </div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="text-2xl font-mono font-semibold text-zinc-100">
-            {formatCurrency(totalPipelineBudget)}
+            {currencyTotals.length ? formatMoney(currencyTotals[0][1].total, currencyTotals[0][0] as 'GBP' | 'USD') : formatMoney(0, 'GBP')}
           </span>
           <span className="text-xs text-zinc-400 font-mono">{jobs.length} briefs</span>
         </div>
         <div className="mt-1 text-xs text-zinc-400">
-          Average brief value: {jobs.length ? formatCurrency(totalPipelineBudget / jobs.length) : '$0'}
+          {currencyTotals.length > 1
+            ? `Plus ${currencyTotals
+                .slice(1)
+                .map(([c, t]) => `${formatMoney(t.total, c as 'GBP' | 'USD')} (${t.count} ${c} brief${t.count === 1 ? '' : 's'})`)
+                .join(', ')}`
+            : currencyTotals.length
+            ? `Average brief value: ${formatMoney(currencyTotals[0][1].total / currencyTotals[0][1].count, currencyTotals[0][0] as 'GBP' | 'USD')}`
+            : 'No briefs yet'}
         </div>
       </div>
 
@@ -98,7 +114,7 @@ export function MetricCards({ jobs, waitingOnly, onToggleWaitingOnly }: MetricCa
           <span className="text-xs text-zinc-400 font-mono">signed-off</span>
         </div>
         <div className="mt-1 text-xs text-zinc-400">
-          Standard gross margin target: ~85%
+          Delivered with final sign-off
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
   RotateCcw,
   AlertTriangle,
 } from 'lucide-react';
+import { isSimulatedGeneration } from '@/lib/money';
 
 interface OutputsTabProps {
   job: Job;
@@ -184,8 +185,8 @@ export function OutputsTab({ job, generations = [], workflow, onRefresh }: Outpu
                     Request ID: <span className="text-zinc-300 text-xs">{gen.providerRequestId}</span>
                   </div>
                   <div className="text-right">
-                    Cost Incurred:{' '}
-                    <strong className={gen.actualCost ? 'text-emerald-400' : 'text-zinc-400'}>
+                    {isSimulatedGeneration(gen) ? 'Simulated cost (not billed)' : 'Billed cost'}:{' '}
+                    <strong className={gen.actualCost && !isSimulatedGeneration(gen) ? 'text-emerald-400' : 'text-zinc-400'}>
                       {formatCurrency(gen.actualCost || 0)}
                     </strong>
                   </div>

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, clientName, source, rawBrief, budget, deadline, clientNotes, referenceAssets, channelFeePct: requestedFeePct } = body;
+    const { title, clientName, source, rawBrief, budget, deadline, clientNotes, referenceAssets, channelFeePct: requestedFeePct, currency } = body;
 
     if (!rawBrief || !title) {
       return NextResponse.json(
@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
       clientNotes: clientNotes || '',
       referenceAssets: referenceAssets || [],
       channelFeePct,
+      currency: currency === 'USD' ? 'USD' : 'GBP',
       contingencyPct: 15,
       approvalCheckpoints: {
         workflowApproved: false,

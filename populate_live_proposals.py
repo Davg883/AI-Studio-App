@@ -29,6 +29,7 @@ if cafe_id not in existing_ids:
     cafe_job = {
         "id": cafe_id,
         "isDemo": True,
+        "currency": "GBP",
         "title": "Appley Café: Breakfast by the Sea (Chef-Led Pilot)",
         "clientName": "Appley Café & Chef Joe (Ryde, Isle of Wight)",
         "source": "Direct Lead",
@@ -205,6 +206,7 @@ if manor_id not in existing_ids:
     manor_job = {
         "id": manor_id,
         "isDemo": True,
+        "currency": "GBP",
         "title": "Appley Manor: 30-Day Digital Sprint (\"Same Manor Heart. New Chapter.\")",
         "clientName": "Appley Manor Hotel & Restaurant (Ryde, Isle of Wight)",
         "source": "Direct Lead",
@@ -382,6 +384,7 @@ if garlic_id not in existing_ids:
     garlic_job = {
         "id": garlic_id,
         "isDemo": True,
+        "currency": "GBP",
         "title": "The Garlic Farm: \"Shrouded in Garlic\" (The Darker Side of Wight)",
         "clientName": "The Garlic Farm × Peter J Murray × Medina Publishing",
         "source": "Direct Lead",

@@ -605,7 +605,8 @@
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
       },
-      "isDemo": true
+      "isDemo": true,
+      "currency": "GBP"
     },
     {
       "id": "job-appley-manor-sprint",
@@ -772,7 +773,8 @@
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
       },
-      "isDemo": true
+      "isDemo": true,
+      "currency": "GBP"
     },
     {
       "id": "job-appley-cafe-pilot",
@@ -944,7 +946,8 @@
         "modelUsed": "gpt-6-astra (Internal Analysis)",
         "analyzedAt": "2026-09-24T16:26:24.742771Z"
       },
-      "isDemo": true
+      "isDemo": true,
+      "currency": "GBP"
     },
     {
       "title": "Solstice Electric GT - 30s Reveal",

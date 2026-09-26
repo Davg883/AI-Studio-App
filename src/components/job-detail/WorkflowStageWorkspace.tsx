@@ -115,11 +115,13 @@ export function WorkflowStageWorkspace({
   const maxApprovedSpend = state.budgetLocked
     ? job.maxApprovedBudget ?? job.approvalCheckpoints.maxBudgetAmount ?? workflow?.maxApprovedSpend ?? null
     : null;
-  const actualGenSpend = profitability?.actualGenSpend ?? 0;
+  // Spend counted against the provider cap (USD): billed plus simulated runs
+  const actualGenSpend = (profitability?.actualGenSpendUSD ?? 0) + (profitability?.simulatedGenSpendUSD ?? 0);
   const reservedSpend = job.reservedSpend || 0;
   const remainingBudget =
     maxApprovedSpend != null ? Math.max(0, maxApprovedSpend - (actualGenSpend + reservedSpend)) : null;
-  const marginPct = profitability ? profitability.expectedMarginPct : null;
+  const contributionPct = profitability ? profitability.expectedContributionPct : null;
+  const contributionComplete = profitability?.contributionComplete ?? false;
   const deliverableNames = (job.verifiedDeliverables || []).map(d => d.name);
 
   // Authorise message handler
@@ -295,9 +297,14 @@ export function WorkflowStageWorkspace({
             )}
             <div className="text-xs text-zinc-400 flex items-center justify-between">
               <span>Reserved: {formatCurrency(reservedSpend)}</span>
-              {marginPct != null && (
-                <span className="text-cyan-400">Expected margin: {marginPct}%</span>
-              )}
+              {contributionPct != null &&
+                (contributionComplete ? (
+                  <span className="text-cyan-400">Expected contribution: {contributionPct}%</span>
+                ) : (
+                  <span className="text-amber-300" title={`Missing: ${profitability?.missingCosts.join(', ')}`}>
+                    Contribution incomplete
+                  </span>
+                ))}
             </div>
           </div>
         </div>

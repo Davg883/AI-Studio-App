@@ -42,6 +42,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useOperatorName } from '@/lib/operator';
+import { formatMoney, jobCurrency, isSimulatedGeneration } from '@/lib/money';
 
 interface WorkflowTabProps {
   job: Job;
@@ -462,9 +463,9 @@ export function WorkflowTab({
               </div>
             </div>
             <div className="border-l border-zinc-800 pl-4">
-              <div className="text-zinc-400 text-xs uppercase">Contract Budget</div>
+              <div className="text-zinc-400 text-xs uppercase">Client price</div>
               <div className="text-zinc-200 font-bold text-sm">
-                {formatCurrency(job.budget)}
+                {formatMoney(job.budget, jobCurrency(job))}
               </div>
             </div>
           </div>
@@ -643,6 +644,11 @@ export function WorkflowTab({
                   <div className="text-right">
                     <div className="text-zinc-200 font-bold">
                       ${(step.actualCost ?? step.estimatedTotalCost).toFixed(2)}
+                      {step.actualCost !== undefined && genRecord && (
+                        <span className="ml-1 text-xs font-normal text-zinc-400">
+                          {isSimulatedGeneration(genRecord) ? 'simulated' : 'billed'}
+                        </span>
+                      )}
                     </div>
                     <div className="text-xs text-zinc-400">
                       {step.estimatedAttempts} attempts @ ${step.unitCost.toFixed(2)}
@@ -999,7 +1005,7 @@ export function WorkflowTab({
                         <strong>Generation Request ID:</strong> {genRecord.providerRequestId}
                       </div>
                       <div className="text-zinc-400">
-                        <strong>Reconciled GPU Spend:</strong> ${genRecord.actualCost ?? 0} (Pre-gen estimate: ${genRecord.costEstimate})
+                        <strong>{isSimulatedGeneration(genRecord) ? 'Simulated spend (not billed)' : 'Billed spend'}:</strong> ${genRecord.actualCost ?? 0} (Pre-gen estimate: ${genRecord.costEstimate})
                       </div>
                       {genRecord.error && (
                         <div className="text-red-400">

@@ -60,7 +60,12 @@ export interface Job {
   reservedSpend?: number;
   laborHoursEstimated?: number;
   laborHoursActual?: number;
+  /** @deprecated legacy jobs only: labour rate recorded when every job was priced in USD */
   laborRatePerHourUSD?: number;
+  /** Operator labour rate in the job's client currency */
+  laborRatePerHour?: number;
+  /** Client quotation currency; absent on legacy jobs, which were priced in USD */
+  currency?: 'GBP' | 'USD';
   verifiedDeliverables?: import('./autonomy').VerifiedDeliverable[];
   /** Seeded / demonstration scenario, not a commissioned job; approvals on it are not real */
   isDemo?: boolean;
@@ -283,27 +288,52 @@ export interface Revision {
   resolvedAt?: string;
 }
 
+/**
+ * Job economics. Amounts without a USD suffix are in the job's client currency (`currency`).
+ * Provider spend is billed in USD and kept separate; it is converted with `fxRateUsdToClient`
+ * only to compute contribution.
+ *
+ * Contribution = client price - estimated generation spend - contingency - channel fee - operator labour.
+ * It excludes overheads, software subscriptions and tax, so it is not net profit.
+ */
 export interface ProfitabilityMetrics {
+  currency: 'GBP' | 'USD';
+  fxRateUsdToClient: number;
+  /** True when no USD_TO_GBP_RATE is configured and the default rate is used */
+  fxRateIsAssumed: boolean;
+
   clientBudget: number;
+
+  // Provider spend, USD as billed
+  estimatedGenSpendUSD: number;
+  /** Mock / simulated runs: never billed */
+  simulatedGenSpendUSD: number;
+  /** Live provider runs only */
+  actualGenSpendUSD: number;
+
+  // Client currency
   estimatedGenSpend: number;
-  actualGenSpend: number;
   contingencyPct: number;
   contingencyAmount: number;
   channelFeePct: number;
   channelFeeAmount: number;
+  laborCosted: boolean;
+  laborHoursEstimated?: number;
+  laborRatePerHour?: number;
+  laborCostEstimated: number;
   totalEstimatedCost: number;
-  expectedGrossMargin: number;
-  expectedMarginPct: number;
-  actualGrossMargin?: number;
-  actualMarginPct?: number;
-  budgetStatus: 'healthy' | 'warning' | 'deficit';
-  // Explicit Studio Labor & Operational Economics
-  laborCostEstimated?: number;
-  laborCostActual?: number;
-  finishingSpend?: number;
-  revisionsSpend?: number;
-  netProfitUSD?: number;
-  netMarginPct?: number;
+
+  expectedContribution: number;
+  expectedContributionPct: number;
+  /** False while a cost input is missing; the figure then overstates contribution */
+  contributionComplete: boolean;
+  missingCosts: string[];
+
+  /** Only present once live (billed) provider spend exists */
+  actualContribution?: number;
+  actualContributionPct?: number;
+
+  budgetStatus: 'healthy' | 'warning' | 'deficit' | 'incomplete';
 }
 
 export * from './autonomy';

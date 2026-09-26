@@ -4,6 +4,7 @@ import { Job } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Badge } from '../ui/badge';
 import { ArrowLeft, Clock, DollarSign, ExternalLink, Calendar, Building, Globe, FlaskConical } from 'lucide-react';
+import { formatMoney, jobCurrency } from '@/lib/money';
 
 interface JobHeaderProps {
   job: Job;
@@ -94,16 +95,16 @@ export function JobHeader({ job }: JobHeaderProps) {
         <div className="flex items-center gap-4 bg-zinc-900/80 border border-zinc-800 rounded-lg px-4 py-2 self-start lg:self-auto">
           <div>
             <div className="text-xs uppercase tracking-wider text-zinc-400">
-              Client Fixed Price
+              Client price
             </div>
             <div className="text-xl font-bold text-emerald-400">
-              {formatCurrency(job.budget)}
+              {formatMoney(job.budget, jobCurrency(job))}
             </div>
           </div>
           {job.maxApprovedBudget && (
             <div className="pl-3 border-l border-zinc-800">
               <div className="text-xs uppercase tracking-wider text-zinc-400">
-                Max Spend Approved
+                Provider spend cap (USD)
               </div>
               <div className="text-sm font-bold text-amber-300">
                 {formatCurrency(job.maxApprovedBudget)}

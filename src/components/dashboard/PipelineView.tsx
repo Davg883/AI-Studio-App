@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { Badge } from '../ui/badge';
 import { ShieldCheck, ShieldAlert, Clock, CheckCircle2, Loader2, ChevronsRightLeft } from 'lucide-react';
 import { getJobState, daysUntil } from '@/lib/job-state';
+import { formatMoney, jobCurrency } from '@/lib/money';
 
 interface PipelineViewProps {
   jobs: Job[];
@@ -148,7 +149,7 @@ export function PipelineView({ jobs }: PipelineViewProps) {
                           )}
                         </span>
                         <span className="text-sm font-mono font-semibold text-emerald-400">
-                          {formatCurrency(job.budget)}
+                          {formatMoney(job.budget, jobCurrency(job))}
                         </span>
                       </div>
 
@@ -187,7 +188,7 @@ export function PipelineView({ jobs }: PipelineViewProps) {
                             </span>
                           )}
                           {state.budgetLocked && job.maxApprovedBudget != null && (
-                            <span className="flex items-center gap-1 text-emerald-400" title="Approved spend ceiling">
+                            <span className="flex items-center gap-1 text-emerald-400" title="Approved provider spend ceiling (USD)">
                               <ShieldCheck className="h-3 w-3" />
                               {formatCurrency(job.maxApprovedBudget)} cap
                             </span>

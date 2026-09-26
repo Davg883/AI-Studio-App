@@ -7,7 +7,7 @@ import { Button } from '../ui/button';
 import { JobSource } from '@/types';
 import { SOURCE_DEFAULT_FEES } from '@/lib/constants';
 import { ShieldCheck, Sparkles } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatMoney, ClientCurrency } from '@/lib/money';
 import { useStudioConfig } from '@/lib/use-studio-config';
 
 interface NewJobModalProps {
@@ -81,6 +81,7 @@ export function NewJobModal({ isOpen, onClose, onCreated }: NewJobModalProps) {
   const [source, setSource] = useState<JobSource>('Upwork');
   const [channelFeePct, setChannelFeePct] = useState(String(SOURCE_DEFAULT_FEES['Upwork'] ?? 0));
   const [budget, setBudget] = useState('2500');
+  const [currency, setCurrency] = useState<ClientCurrency>('GBP');
   const [deadline, setDeadline] = useState(
     new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]
   );
@@ -139,6 +140,7 @@ export function NewJobModal({ isOpen, onClose, onCreated }: NewJobModalProps) {
           clientName: clientName || 'Anonymous Client',
           source,
           channelFeePct: feePctNum,
+          currency,
           rawBrief,
           budget: budgetNum,
           deadline: new Date(deadline).toISOString(),
@@ -298,17 +300,28 @@ export function NewJobModal({ isOpen, onClose, onCreated }: NewJobModalProps) {
 
           <div>
             <label htmlFor="job-budget" className={labelClass}>
-              Client budget ($) *
+              Client price *
             </label>
-            <input
-              id="job-budget"
-              type="number"
-              min="0"
-              required
-              value={budget}
-              onChange={e => setBudget(e.target.value)}
-              className={`${inputClass} font-mono`}
-            />
+            <div className="flex gap-1">
+              <select
+                aria-label="Quotation currency"
+                value={currency}
+                onChange={e => setCurrency(e.target.value as ClientCurrency)}
+                className="rounded bg-zinc-900 border border-zinc-800 px-1.5 text-sm text-zinc-100 focus:outline-none focus:border-zinc-500"
+              >
+                <option value="GBP">£ GBP</option>
+                <option value="USD">$ USD</option>
+              </select>
+              <input
+                id="job-budget"
+                type="number"
+                min="0"
+                required
+                value={budget}
+                onChange={e => setBudget(e.target.value)}
+                className={`${inputClass} font-mono`}
+              />
+            </div>
           </div>
 
           <div>
@@ -329,13 +342,13 @@ export function NewJobModal({ isOpen, onClose, onCreated }: NewJobModalProps) {
         {/* Early economics preview: production costs are added once the workflow is planned */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-400">
           <span>
-            Channel fee: <span className="font-mono text-zinc-200">{formatCurrency(feeAmount)}</span>
+            Channel fee: <span className="font-mono text-zinc-200">{formatMoney(feeAmount, currency)}</span>
           </span>
           <span>
             You keep before production:{' '}
-            <span className="font-mono text-emerald-300">{formatCurrency(budgetNum - feeAmount)}</span>
+            <span className="font-mono text-emerald-300">{formatMoney(budgetNum - feeAmount, currency)}</span>
           </span>
-          <span>Generation spend and labour are estimated after analysis.</span>
+          <span>Provider costs (billed in USD) and labour are added after planning.</span>
         </div>
 
         <div>

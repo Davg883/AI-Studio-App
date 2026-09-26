@@ -14,7 +14,7 @@ import {
 } from '@/types';
 import { JobHeader } from '@/components/job-detail/JobHeader';
 import { ApprovalTimeline } from '@/components/job-detail/ApprovalTimeline';
-import { ProfitabilityPanel } from '@/components/job-detail/ProfitabilityPanel';
+import { ProfitabilityPanel, JobEconomicsUpdate } from '@/components/job-detail/ProfitabilityPanel';
 import { WorkflowStageWorkspace } from '@/components/job-detail/WorkflowStageWorkspace';
 import { ClientMemoryModal } from '@/components/job-detail/ClientMemoryModal';
 import { BriefTab } from '@/components/job-detail/BriefTab';
@@ -168,7 +168,7 @@ export default function JobDetailPage() {
   };
 
   // Handler: Update Job Financial Settings (Channel Fee, Contingency)
-  const handleUpdateJobConfig = async (updates: { channelFeePct?: number; contingencyPct?: number }) => {
+  const handleUpdateJobConfig = async (updates: JobEconomicsUpdate) => {
     try {
       const res = await fetch(`/api/jobs/${jobId}`, {
         method: 'PATCH',

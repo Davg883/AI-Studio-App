@@ -16,7 +16,8 @@ async function testWorkflow() {
   console.log(`Astra Decision: ${data.analysis?.decision} (Confidence: ${data.analysis?.confidence}%)`);
   console.log(`Workflow steps: ${data.workflow?.steps.length}, Total Est: $${data.workflow?.totalEstimatedCost}`);
   console.log(`Generations rendered: ${data.generations?.length}`);
-  console.log(`Gross Margin: $${data.profitability.expectedGrossMargin} (${data.profitability.expectedMarginPct}%)`);
+  const econ = data.profitability;
+  console.log(`Expected contribution: ${econ.expectedContribution} ${econ.currency} (${econ.expectedContributionPct}%)${econ.contributionComplete ? '' : ` - incomplete, missing ${econ.missingCosts.join(', ')}`}`);
 
   console.log('\n--- 3. Testing POST /api/jobs (New Job Ingestion) ---');
   res = await fetch(`${BASE}/api/jobs`, {
