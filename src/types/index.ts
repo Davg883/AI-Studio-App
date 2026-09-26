@@ -68,6 +68,8 @@ export interface Job {
   productionComplete?: boolean;
   // Computed by the jobs list API (not persisted): a production workflow exists
   workflowBuilt?: boolean;
+  // Computed by the jobs list API (not persisted): a concept step is waiting for the operator's choice
+  conceptSelectionPending?: boolean;
 }
 
 export interface StructuredDeliverable {
@@ -214,6 +216,14 @@ export interface WorkflowStep {
   status: 'Pending Approval' | 'Queued' | 'Running' | 'Completed' | 'Failed' | 'Canceled' | 'Skipped';
   generationId?: string;
   previousGenerationIds?: string[];
+  /** Concept checkpoint: later steps wait until the operator chooses what carries forward */
+  requiresConceptSelection?: boolean;
+  conceptSelection?: {
+    generationIds: string[];
+    selectedBy: string;
+    selectedAt: string;
+    notes?: string;
+  };
 }
 
 export interface Workflow {

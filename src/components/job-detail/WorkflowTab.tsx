@@ -2,7 +2,14 @@
 
 import React, { useState } from 'react';
 import { Workflow, WorkflowStep, Job, Generation, ProductionRole } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDateTime } from '@/lib/utils';
+import {
+  isConceptStep,
+  blockingConceptStep,
+  conceptGateMessage,
+  pendingConceptSelection,
+  MAX_CONCEPT_SELECTIONS,
+} from '@/lib/concept-gate';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { CapabilityCatalogModal } from '../workflow/CapabilityCatalogModal';
@@ -88,6 +95,8 @@ export function WorkflowTab({
   buildingWorkflow,
 }: WorkflowTabProps) {
   const [operatorName] = useOperatorName();
+  const [conceptPicks, setConceptPicks] = useState<string[]>([]);
+  const [savingConcepts, setSavingConcepts] = useState(false);
   const [runningStepId, setRunningStepId] = useState<string | null>(null);
   const [cancelingStepId, setCancelingStepId] = useState<string | null>(null);
   const [runningAll, setRunningAll] = useState(false);
@@ -223,6 +232,42 @@ export function WorkflowTab({
     }
   };
 
+  // Concept checkpoint: record which concepts carry forward
+  const handleConfirmConcepts = async (stepId: string) => {
+    try {
+      setErrorMessage(null);
+      setSavingConcepts(true);
+      const res = await fetch(`/api/jobs/${job.id}/concept-selection`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stepId, generationIds: conceptPicks, operatorName }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not record concept selection');
+      }
+      setSuccessMessage(
+        `${conceptPicks.length} concept${conceptPicks.length === 1 ? '' : 's'} carried forward. Later steps can now run.`
+      );
+      setConceptPicks([]);
+      onRefresh();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not record concept selection');
+    } finally {
+      setSavingConcepts(false);
+    }
+  };
+
+  const toggleConceptPick = (generationId: string) => {
+    setConceptPicks(prev =>
+      prev.includes(generationId)
+        ? prev.filter(id => id !== generationId)
+        : prev.length >= MAX_CONCEPT_SELECTIONS
+        ? prev
+        : [...prev, generationId]
+    );
+  };
+
   // Run All Handler
   const handleRunAll = async () => {
     try {
@@ -239,6 +284,9 @@ export function WorkflowTab({
         throw new Error(data.error || 'Generation failed');
       }
 
+      if (data.haltedForConceptSelection) {
+        setSuccessMessage(`Paused at the concept checkpoint. ${data.haltedForConceptSelection.message}`);
+      }
       onRefresh();
     } catch (err: any) {
       setErrorMessage(err.message || 'Generation execution refused');
@@ -311,6 +359,7 @@ export function WorkflowTab({
 
   const allCompleted = workflow.steps.every(s => s.status === 'Completed');
   const pendingSteps = workflow.steps.filter(s => s.status !== 'Completed');
+  const conceptPending = pendingConceptSelection(workflow);
 
   return (
     <div className="space-y-6">
@@ -480,11 +529,16 @@ export function WorkflowTab({
                   size="sm"
                   onClick={handleRunAll}
                   loading={runningAll}
-                  disabled={!!runningStepId}
+                  disabled={!!runningStepId || !!conceptPending}
+                  title={
+                    conceptPending
+                      ? conceptGateMessage(conceptPending)
+                      : 'Runs pending steps in order; pauses at the concept checkpoint for your choice'
+                  }
                   className="text-xs"
                 >
                   <Play className="h-3 w-3 mr-1.5 fill-current" />
-                  Run All Approved Steps ({pendingSteps.length})
+                  {conceptPending ? 'Choose concepts to continue' : `Run All Approved Steps (${pendingSteps.length})`}
                 </Button>
               )}
             </div>
@@ -657,7 +711,12 @@ export function WorkflowTab({
                         variant="primary"
                         onClick={() => handleRunStep(step.id)}
                         loading={isRunning}
-                        disabled={!isApproved || runningAll}
+                        disabled={!isApproved || runningAll || !!blockingConceptStep(workflow, step)}
+                        title={
+                          blockingConceptStep(workflow, step)
+                            ? conceptGateMessage(blockingConceptStep(workflow, step)!)
+                            : undefined
+                        }
                         className="text-xs font-mono h-7"
                       >
                         <Play className="h-3 w-3 mr-1 fill-current" />
@@ -688,6 +747,72 @@ export function WorkflowTab({
                   </button>
                 </div>
               </div>
+
+              {/* Concept checkpoint: operator chooses what carries forward */}
+              {isConceptStep(step) && step.status === 'Completed' && (() => {
+                const conceptOutputs = generations.filter(g => g.stepId === step.id && g.status === 'Completed');
+                if (step.conceptSelection) {
+                  return (
+                    <div className="mx-4 mb-3 rounded-lg border border-emerald-900/60 bg-emerald-950/20 p-3 text-xs text-emerald-200">
+                      <CheckCircle2 className="inline h-3.5 w-3.5 mr-1 text-emerald-400" />
+                      {step.conceptSelection.generationIds.length} concept
+                      {step.conceptSelection.generationIds.length === 1 ? '' : 's'} carried forward by{' '}
+                      {step.conceptSelection.selectedBy} · {formatDateTime(step.conceptSelection.selectedAt)}
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mx-4 mb-3 rounded-lg border border-amber-700/60 bg-amber-950/20 p-3 space-y-3">
+                    <div className="text-xs text-amber-200">
+                      <span className="font-semibold">Concept checkpoint.</span> Choose up to {MAX_CONCEPT_SELECTIONS}{' '}
+                      concepts to carry forward. Later steps stay locked until you do.
+                    </div>
+                    {conceptOutputs.length === 0 ? (
+                      <p className="text-xs text-zinc-400">No completed concept outputs yet. Re-roll this step to generate some.</p>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2" role="group" aria-label="Concept outputs">
+                        {conceptOutputs.map((g, idx) => {
+                          const picked = conceptPicks.includes(g.id);
+                          const preview = g.thumbnailUrl || g.outputUrl;
+                          return (
+                            <button
+                              key={g.id}
+                              type="button"
+                              onClick={() => toggleConceptPick(g.id)}
+                              aria-pressed={picked}
+                              className={`rounded-md border p-1.5 text-left text-xs transition-colors ${
+                                picked
+                                  ? 'border-amber-400 bg-amber-950/40 text-amber-100'
+                                  : 'border-zinc-800 bg-zinc-950 text-zinc-300 hover:border-zinc-600'
+                              }`}
+                            >
+                              {preview && g.outputType !== 'audio' ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={preview} alt={`Concept ${idx + 1}`} className="aspect-video w-full rounded object-cover" />
+                              ) : (
+                                <div className="aspect-video w-full rounded bg-zinc-900" />
+                              )}
+                              <span className="mt-1 block">
+                                {picked ? '✓ ' : ''}Concept {idx + 1}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => handleConfirmConcepts(step.id)}
+                      loading={savingConcepts}
+                      disabled={conceptPicks.length === 0}
+                      className="text-xs"
+                    >
+                      Carry forward {conceptPicks.length}/{MAX_CONCEPT_SELECTIONS}
+                    </Button>
+                  </div>
+                );
+              })()}
 
               {/* Transparent Routing Analysis: Why It Fits, Failure Mode & Alternative */}
               <div className="px-4 pb-4 grid grid-cols-1 md:grid-cols-3 gap-3">

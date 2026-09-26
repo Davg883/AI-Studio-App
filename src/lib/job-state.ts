@@ -1,4 +1,5 @@
 import { Job, BriefAnalysis, Workflow } from '@/types';
+import { pendingConceptSelection } from './concept-gate';
 
 export type StageKey = 'brief' | 'plan' | 'authorise' | 'produce' | 'review' | 'deliver';
 export type StageStatus = 'done' | 'current' | 'upcoming';
@@ -72,6 +73,8 @@ export function getJobState(
       opts.workflow.steps.every(step => step.status === 'Completed' || step.status === 'Skipped')
     : !!job.productionComplete;
   const produced = delivered || status === 'QA' || workflowComplete;
+  const conceptChoicePending =
+    opts.workflow !== undefined ? !!pendingConceptSelection(opts.workflow) : !!job.conceptSelectionPending;
 
   let currentStage: StageKey;
   let nextAction: string;
@@ -109,6 +112,13 @@ export function getJobState(
     blocker = 'Rights clearance pending';
     waitingOn = 'Rights clearance';
     actionTarget = { stage: 'authorise' };
+  } else if (!produced && conceptChoicePending) {
+    // Human checkpoint mid-production: later steps are blocked until concepts are chosen
+    currentStage = 'produce';
+    nextAction = 'Choose which concepts carry forward';
+    blocker = 'Concept selection required before later steps run';
+    waitingOn = 'Concept selection';
+    actionTarget = { stage: 'plan', section: 'workflow' };
   } else if (!produced) {
     currentStage = 'produce';
     nextAction = generating

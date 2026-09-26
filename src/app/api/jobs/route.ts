@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getRepository } from '@/lib/repository/json-repository';
 import { SOURCE_DEFAULT_FEES } from '@/lib/constants';
 import { JobSource } from '@/types';
+import { pendingConceptSelection } from '@/lib/concept-gate';
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,7 +20,13 @@ export async function GET(req: NextRequest) {
         const productionComplete =
           !!workflow?.steps.length &&
           workflow.steps.every(step => step.status === 'Completed' || step.status === 'Skipped');
-        return { ...job, hasOpenRightsIssue, productionComplete, workflowBuilt: !!workflow };
+        return {
+          ...job,
+          hasOpenRightsIssue,
+          productionComplete,
+          workflowBuilt: !!workflow,
+          conceptSelectionPending: !!pendingConceptSelection(workflow),
+        };
       })
     );
     return NextResponse.json({ success: true, jobs });

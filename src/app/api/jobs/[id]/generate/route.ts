@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getRepository } from '@/lib/repository/json-repository';
 import { GenerationRunner } from '@/lib/services/generation-runner';
 import { OperatorGuardrails } from '@/lib/guardrails';
+import { blockingConceptStep, conceptGateMessage, isConceptStep } from '@/lib/concept-gate';
 
 interface RouteContext {
   params: { id: string };
@@ -71,11 +72,23 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         startedAt: new Date().toISOString(),
       };
 
+      const retryBlocker = blockingConceptStep(workflow, step);
+      if (retryBlocker) {
+        return NextResponse.json(
+          { success: false, error: conceptGateMessage(retryBlocker), blockedByStepId: retryBlocker.id },
+          { status: 409 }
+        );
+      }
+
       const { generation: newGen, updatedStep } = await GenerationRunner.retryStep(job, step, prevGen);
 
       // Crucial: add new generation attempt to history without overwriting previous attempts
       await repo.addGeneration(newGen);
-      await repo.updateWorkflowStep(id, step.id, updatedStep);
+      await repo.updateWorkflowStep(id, step.id, {
+        ...updatedStep,
+        // New concept outputs invalidate the earlier choice
+        ...(isConceptStep(step) ? { conceptSelection: undefined } : {}),
+      });
 
       return NextResponse.json({
         success: true,
@@ -109,22 +122,44 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       );
     }
 
-    // Set job status to Generating if not already
-    if (job.status !== 'Generating') {
-      await repo.updateJob(id, { status: 'Generating' });
-    }
-
     const results = [];
-    const stepsToRun = runAll
-      ? workflow.steps.filter(s => s.status !== 'Completed')
-      : workflow.steps.filter(s => s.id === stepId || (!stepId && s.status !== 'Completed'));
+    const stepsToRun = (
+      runAll
+        ? workflow.steps.filter(s => s.status !== 'Completed')
+        : workflow.steps.filter(s => s.id === stepId || (!stepId && s.status !== 'Completed'))
+    ).sort((a, b) => a.order - b.order);
 
     if (stepsToRun.length === 0) {
       return NextResponse.json({ success: true, message: 'No pending steps to execute' });
     }
 
+    // Concept checkpoint: nothing after the SEARCH step runs until the operator has chosen concepts
+    const firstBlocker = blockingConceptStep(workflow, stepsToRun[0]);
+    if (firstBlocker) {
+      return NextResponse.json(
+        { success: false, error: conceptGateMessage(firstBlocker), blockedByStepId: firstBlocker.id },
+        { status: 409 }
+      );
+    }
+
+    // Set job status to Generating if not already
+    if (job.status !== 'Generating') {
+      await repo.updateJob(id, { status: 'Generating' });
+    }
+
+    let haltedForConceptSelection: { stepId: string; stepName: string; message: string } | null = null;
+
     for (let i = 0; i < stepsToRun.length; i++) {
       const step = stepsToRun[i];
+
+      // Re-check against the latest workflow: a concept step completed earlier in this loop now needs a choice
+      const latest = (await repo.getWorkflow(id)) || workflow;
+      const blocker = blockingConceptStep(latest, step);
+      if (blocker) {
+        haltedForConceptSelection = { stepId: blocker.id, stepName: blocker.name, message: conceptGateMessage(blocker) };
+        break;
+      }
+
       const { generation, updatedStep } = await GenerationRunner.executeStep(job, step, i);
 
       await repo.addGeneration(generation);
@@ -149,6 +184,7 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       executed: results,
       allCompleted,
       jobStatus: allCompleted ? 'QA' : 'Generating',
+      haltedForConceptSelection,
     });
   } catch (error: any) {
     return NextResponse.json(
